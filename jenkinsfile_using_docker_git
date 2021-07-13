@@ -1,0 +1,33 @@
+pipeline{
+
+	agent any
+	  
+	parameters{
+		string(name : 'DEPLOY_ENV', defaultValue: 'staging', description: 'mutiple environment')	
+	}
+
+	stages{
+		stage('Checkout'){
+			steps{
+			  checkout scm
+		} }
+		stage('Build'){
+			steps{
+			  sh '/home/swapnil/Documents/jenkins-server/apache-maven-3.6.0/bin/mvn install'
+		} }
+		stage('Build_Image'){
+			steps{
+			  sh 'docker build -t="swapnilhub/jenkinsfile-image" .'
+		} }
+		stage('Create_Environment'){
+			steps{
+			  sh './create-env.sh $DEPLOY_ENV'
+		}}
+		stage('Merge'){
+			steps{
+			   sh 'git checkout origin/master'
+		           sh 'git merge origin/dev1.1'
+		}}
+		
+	}
+}
